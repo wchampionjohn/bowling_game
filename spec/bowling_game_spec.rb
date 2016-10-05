@@ -1,5 +1,6 @@
 require 'rspec'
 require_relative '../lib/bowling_game'
+require 'byebug'
 
 describe 'Bowling Game' do
   it 'can create game' do
