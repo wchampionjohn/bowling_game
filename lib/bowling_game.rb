@@ -4,16 +4,21 @@ class Game
   end
 
   def roll points
+    if current_frame_index == 9
+      @rolls << [nil, nil] if points == 10
+      @rolls << [nil] if (@rolls[current_frame_index].first.to_i + points == 10)
+    end
+
     @rolls[current_frame_index][current_times_index] = points
   end
 
   def scope
-    completed_rolls.each_with_index.inject(0) do |sum, (frame,index)|
+    regular_frames.each_with_index.inject(0) do |sum, (frame,index)|
       sum += frame.compact.reduce(:+)
 
       sum += if strike? frame
                after_rolls = completed_rolls[index+1..index+2].flatten # 下兩局的分數
-               after_rolls[0] + after_rolls[1] # 下兩次的總和
+               after_rolls[0].to_i + after_rolls[1].to_i # 下兩次的總和
              elsif space? frame
                completed_rolls[index + 1].first
              else
@@ -37,6 +42,10 @@ class Game
     @rolls.each_with_object([]) do |frame, result|
       result << frame unless frame.compact.empty?
     end
+  end
+
+  def regular_frames
+    completed_rolls[0..9]
   end
 
   def space? frame

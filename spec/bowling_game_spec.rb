@@ -33,4 +33,23 @@ describe 'Bowling Game' do
     game.roll 4
     expect(game.scope).to eq 28
   end
+
+  it 'ofter last frame can add two times if last frame is strike' do
+    game = Game.new
+    18.times { game.roll 4 }
+    game.roll 10
+    game.roll 5
+    game.roll 4
+    expect(game.scope).to eq 91
+  end
+
+
+  it 'ofter last frame can add two times if last frame is strike' do
+    game = Game.new
+    18.times { game.roll 4 }
+    game.roll 5
+    game.roll 5
+    game.roll 4
+    expect(game.scope).to eq 86
+  end
 end
