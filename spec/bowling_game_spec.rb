@@ -25,4 +25,12 @@ describe 'Bowling Game' do
     game.roll 5
     expect(game.scope).to eq 20
   end
+
+  it 'can calculate strike' do
+    game = Game.new
+    game.roll 10
+    game.roll 5
+    game.roll 4
+    expect(game.scope).to eq 28
+  end
 end
