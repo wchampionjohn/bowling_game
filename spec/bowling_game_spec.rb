@@ -17,4 +17,12 @@ describe 'Bowling Game' do
     20.times { game.roll 3 }
     expect(game.scope).to eq 60
   end
+
+  it 'can calculate spacel' do
+    game = Game.new
+    game.roll 9
+    game.roll 1
+    game.roll 5
+    expect(game.scope).to eq 20
+  end
 end
