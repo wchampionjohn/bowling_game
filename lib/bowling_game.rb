@@ -19,15 +19,7 @@ class Game
   def scope
     completed_rolls.each_with_index.inject(0) do |sum, (frame,index)|
       sum += frame.compact.reduce(:+)
-
-      sum += if strike? frame
-               next_rolls = completed_rolls[index+1..index+2].flatten.compact # 下兩局的擊球分數
-               next_rolls[0].to_i + next_rolls[1].to_i # 下兩次擊球的總和
-             elsif space? frame
-               completed_rolls[index + 1].first
-             else
-               0
-             end
+      sum += extra_points(frame, index) # strke or space額外加分
     end
   end
 
@@ -48,6 +40,19 @@ class Game
   def completed_rolls
     @frames.each_with_object([]) do |frame, result|
       result << frame unless frame.compact.empty?
+    end
+  end
+
+  def extra_points(frame, frame_index)
+    return 0 if frame_index == 9 # 最後一局不額外加分
+
+    if strike? frame
+      next_rolls = completed_rolls[frame_index+1..frame_index+2].flatten.compact # 下兩局的擊球分數
+      next_rolls[0].to_i + next_rolls[1].to_i # 下兩次擊球的分數總和
+    elsif space? frame
+      completed_rolls[frame_index + 1].first # 下一次擊球分數
+    else
+      0
     end
   end
 
