@@ -5,14 +5,11 @@ class Game
   end
 
   def roll points
-    frames_index = current_frame_index
-    times_index = current_times_index
+    @frames[current_frame_index][current_times_index] = points
 
-    @frames[frames_index][times_index] = points
-
-    # 最後一局前兩次加起來沒有超過10分，就沒有第三次擊球機會
-    if frames_index == 9 && times_index == 1
-      @frames[frames_index].pop if @frames[frames_index][0..1].reduce(:+) < 10
+    # 最後一局不是space或strike，就沒有第三次擊球機會
+    if finished_last_frame_and_second_roll?
+      @frames[9].pop unless last_frame_strike_or_space?
     end
   end
 
@@ -44,8 +41,7 @@ class Game
   end
 
   def extra_points(frame, frame_index)
-    return 0 if frame_index == 9 # 最後一局不額外加分
-
+    return 0 if frame_index == 9 # 第10局不額外加分
     if strike? frame
       next_rolls = completed_rolls[frame_index+1..frame_index+2].flatten.compact # 下兩局的擊球分數
       next_rolls[0].to_i + next_rolls[1].to_i # 下兩次擊球的分數總和
@@ -62,5 +58,18 @@ class Game
 
   def strike? frame
     frame.first == 10
+  end
+
+  # 是否完成了最後一局的前兩次擊球?
+  def finished_last_frame_and_second_roll?
+    !@frames[9][1].nil? && @frames[9][2].nil?
+  end
+
+  def last_frame_strike_or_space?
+    space?(last_frame) || strike?(last_frame)
+  end
+
+  def last_frame
+    @frames[9]
   end
 end
