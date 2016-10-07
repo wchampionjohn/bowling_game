@@ -50,6 +50,19 @@ describe 'Bowling Game' do
     game.roll 5
     game.roll 5
     game.roll 4
-    expect(game.scope).to eq 86
+    expect(game.scope).to eq 86 # 72 + 14
+  end
+
+  it 'can roll Turkey' do
+    game = Game.new
+    3.times { game.roll 10 }
+    2.times { game.roll 1 }
+    expect(game.scope).to eq 65 # 30 + 21 + 12 + 2
+  end
+
+  it 'can roll a perfact game' do
+    game = Game.new
+    12.times { game.roll 10 }
+    expect(game.scope).to eq 300
   end
 end
