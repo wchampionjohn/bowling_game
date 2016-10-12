@@ -1,29 +1,31 @@
+require_relative './frame'
+
 class Game
   def initialize
-    @frames = 9.times.inject([]) { |frames| frames << [nil, nil] }
-    @frames << [nil, nil, nil] # 第10局預設有三次機會
+    @frames = 10.times.inject([]) { |frames| frames << Frame.new }
+    @frames.last.added_roll # 第10局預設有三次機會
   end
 
-  def roll points
-    @frames[current_frame_index][current_times_index] = points
+  def roll pins
+    @frames[current_frame_index].regester_roll pins
 
     # 最後一局不是space或strike，就沒有第三次擊球機會
-    if finished_last_frame_and_second_roll?
-      @frames[9].pop unless last_frame_strike_or_space?
+    if last_scope?
+      @frames.last.delete_roll unless last_frame_strike_or_space?
     end
   end
 
   def scope
-    completed_rolls.each_with_index.inject(0) do |sum, (frame,index)|
-      sum += frame.compact.reduce(:+)
-      sum += extra_points(frame, index) # strke or space額外加分
+    completed_roll_frames.each_with_index.inject(0) do |sum, (frame,index)|
+      sum += frame.scope
+      sum += extra_pins(frame, index) # strke or space額外加分
     end
   end
 
   private
   def current_frame_index
     @frames.each_with_index do |frame, index|
-      return index if frame.include?(nil) && !strike?(frame)
+      return index unless frame.completed?
     end
 
     9
@@ -33,43 +35,32 @@ class Game
     @frames[current_frame_index].index(nil)
   end
 
-  # 有擊球局數
-  def completed_rolls
+  # 有擊球的局數
+  def completed_roll_frames
     @frames.each_with_object([]) do |frame, result|
-      result << frame unless frame.compact.empty?
+      result << frame if frame.has_rolls?
     end
   end
 
-  def extra_points(frame, frame_index)
+  def extra_pins(frame, frame_index)
     return 0 if frame_index == 9 # 第10局不額外加分
-    if strike? frame
-      next_rolls = completed_rolls[frame_index+1..frame_index+2].flatten.compact # 下兩局的擊球分數
+    if frame.strike?
+      next_frames = @frames[frame_index+1..frame_index+2]
+      next_rolls = next_frames.map { |frame| frame.rolls }.flatten.compact # 下兩局的擊球分數
       next_rolls[0].to_i + next_rolls[1].to_i # 下兩次擊球的分數總和
-    elsif space? frame
-      completed_rolls[frame_index + 1].first # 下一次擊球分數
+    elsif frame.space?
+      @frames[frame_index+1].rolls.first # 下一次擊球分數
     else
       0
     end
   end
 
-  def space? frame
-    frame.first != 10 && frame.compact.reduce(:+) == 10
-  end
-
-  def strike? frame
-    frame.first == 10
-  end
-
   # 是否完成了最後一局的前兩次擊球?
-  def finished_last_frame_and_second_roll?
-    !@frames[9][1].nil? && @frames[9][2].nil?
+  def last_scope?
+    !@frames.last.rolls[1].nil?
   end
 
   def last_frame_strike_or_space?
-    space?(last_frame) || strike?(last_frame)
-  end
-
-  def last_frame
-    @frames[9]
+    @frames.last.space? || @frames.last.strike?
   end
 end
