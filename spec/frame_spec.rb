@@ -3,14 +3,10 @@ require_relative '../lib/frame'
 require 'byebug'
 
 describe 'Bowling Game Frame' do
-  let(:frame) { Frame.new }
+  let(:frame) { Frame.new(1) }
 
   it 'can create new frame' do
-    Frame.new
-  end
-
-  it 'can additional times' do
-    frame.added_roll
+    Frame.new 1
   end
 
   it 'can regester pins' do
@@ -28,7 +24,7 @@ describe 'Bowling Game Frame' do
     frame.regester_roll 5
     frame.regester_roll 2
     expect(frame.strike?).to be false
-    frame2 = Frame.new
+    frame2 = Frame.new 2
     frame2.regester_roll 10
     expect(frame2.strike?).to be true
   end
@@ -38,7 +34,7 @@ describe 'Bowling Game Frame' do
     frame.regester_roll 5
     frame.regester_roll 2
     expect(frame.space?).to be false
-    frame2 = Frame.new
+    frame2 = Frame.new 2
     frame2.regester_roll 5
     frame2.regester_roll 5
     expect(frame2.space?).to be true
