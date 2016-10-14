@@ -38,7 +38,6 @@ describe 'Bowling Game' do
     expect(game.scope).to eq 91 # 72 + 19
   end
 
-
   it 'can extra append one times roll if last frame is space' do
     18.times { game.roll 4 }
     game.roll 5
@@ -56,5 +55,16 @@ describe 'Bowling Game' do
   it 'can roll a perfact game' do
     12.times { game.roll 10 }
     expect(game.scope).to eq 300
+  end
+  it 'can print game result' do
+    expected_game_result = " 1   2   3   4   5   6   7   8   9   10  \n3 3|3 3|3 3|3 3|3 3|3 3|3 3|3 3|3 3|3 3  | 60"
+    20.times { game.roll 3 }
+    expect(game.game_result).to eq expected_game_result
+
+    game2 = Game.new
+    expected_game_result = " 1   2   3   4   5   6   7   8   9   10  \nX  |3 3|3 3|3 3|3 3|3 3|3 3|3 3|3 3|3 3  | 70"
+    game2.roll 10
+    18.times { game2.roll 3 }
+    expect(game2.game_result).to eq expected_game_result
   end
 end

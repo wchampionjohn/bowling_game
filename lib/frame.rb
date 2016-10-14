@@ -11,13 +11,15 @@ class Frame
   def regester_roll pins
     @rolls[@rolls.index(nil)] = pins
 
+    @rolls[1] = false if strike? && !last?
+
     if last_and_second_rolls?
       @rolls[2] = false if !strike? && !space?
     end
   end
 
   def scope
-    @rolls.delete_if { |roll| !roll }.reduce(:+)
+    @rolls.reject { |roll| !roll }.reduce(:+)
   end
 
   def strike?
@@ -29,7 +31,7 @@ class Frame
   end
 
   def completed?
-    strike? || ! @rolls.include?(nil)
+    strike? || @rolls.all? {|roll| roll }
   end
 
   def has_rolls?
