@@ -56,15 +56,28 @@ describe 'Bowling Game' do
     12.times { game.roll 10 }
     expect(game.scope).to eq 300
   end
-  it 'can print game result' do
-    expected_game_result = " 1   2   3   4   5   6   7   8   9   10  \n3 3|3 3|3 3|3 3|3 3|3 3|3 3|3 3|3 3|3 3  | 60"
-    20.times { game.roll 3 }
-    expect(game.game_result).to eq expected_game_result
 
-    game2 = Game.new
-    expected_game_result = " 1   2   3   4   5   6   7   8   9   10  \nX  |3 3|3 3|3 3|3 3|3 3|3 3|3 3|3 3|3 3  | 70"
-    game2.roll 10
-    18.times { game2.roll 3 }
-    expect(game2.game_result).to eq expected_game_result
+  context 'can calculate print game result' do
+    it 'can show every frame scope' do
+      expected_game_result = " 1   2   3   4   5   6   7   8   9   10  \n3 3|3 3|3 3|3 3|3 3|3 3|3 3|3 3|3 3|3 3  | 60"
+      20.times { game.roll 3 }
+      expect(game.game_result).to eq expected_game_result
+    end
+
+    it 'can show X string if frame is strke' do
+      expected_game_result = " 1   2   3   4   5   6   7   8   9   10  \nX  |3 3|3 3|3 3|3 3|3 3|3 3|3 3|3 3|3 3  | 70"
+      game.roll 10
+      18.times { game.roll 3 }
+      expect(game.game_result).to eq expected_game_result
+    end
+
+    it 'can show  if three strikes bowled consecutively' do
+      expected_game_result = " 1   2   3   4   5   6   7   8   9   10  \n  |  |  |3 3|3 3|3 3|3 3|3 3|3 3|3 3  | 111"
+      game.roll 10
+      game.roll 10
+      game.roll 10
+      14.times { game.roll 3 }
+      expect(game.game_result).to eq expected_game_result
+    end
   end
 end

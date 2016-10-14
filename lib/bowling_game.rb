@@ -21,19 +21,24 @@ class Game
   def game_result
     result = ''
     result << header + "\n"
-    @frames.inject(result) { |result, frame|
-      result << frame.rolls.inject([]) do |r, roll|
+    @frames.inject(result) do |result, frame|
+      result << frame.rolls.each_with_index.inject([]) do |r, (roll, index)|
         r << if !roll
                ' '
+             elsif turkey? frame
+               '' # 找不到適合的符號，用mac符號代替 -.-"
              elsif frame.strike?
                'X'
+             elsif frame.space? && index == 1
+               '/'
              else
                roll
              end
       end.join(' ')
 
       result << '|'
-    }
+    end
+
     result + ' ' + scope.to_s
   end
 
@@ -78,5 +83,22 @@ class Game
                    end
       result << format_num + "  "
     end
+  end
+
+  def turkey? frame
+    index = frame.num - 1
+    prev_index = index-1 < 0 ? 0 : index-1
+    prev_twice_index = index-2 < 0 ? 0 : index-2
+
+    prev_twice_to_now_frames = completed_roll_frames[prev_twice_index..index] # 前二局到這一局
+    prev_to_next_frames =  completed_roll_frames[prev_index..index+1] # 上一局到下一局
+    now_to_next_twice_frames = completed_roll_frames[index..index+2] # 這一局到下二局
+
+    # 連續三局全倒回傳true
+    return true if prev_twice_to_now_frames.size == 3 && prev_twice_to_now_frames.all? { |frame| frame.strike? }
+    return true if prev_to_next_frames.size == 3 && prev_to_next_frames.all? { |frame| frame.strike? }
+    return true if now_to_next_twice_frames.size == 3  && now_to_next_twice_frames.all? { |frame| frame.strike? }
+
+    false
   end
 end

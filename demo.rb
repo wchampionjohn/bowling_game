@@ -5,7 +5,7 @@ game = Game.new
 game2 = Game.new
 
 12.times { game.roll 10 }
-puts game.print
+puts game.game_result
 puts game.scope
 
 20.times { game2.roll 3 }

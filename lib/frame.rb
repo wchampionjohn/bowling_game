@@ -27,7 +27,7 @@ class Frame
   end
 
   def space?
-    @rolls[0].to_i + @rolls[1].to_i == 10
+    !strike? && (@rolls[0].to_i + @rolls[1].to_i == 10)
   end
 
   def completed?
