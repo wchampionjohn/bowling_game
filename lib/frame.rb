@@ -31,7 +31,7 @@ class Frame
   end
 
   def completed?
-    strike? || @rolls.all? {|roll| roll }
+    @rolls.all? {|roll| !roll.nil? }
   end
 
   def has_rolls?

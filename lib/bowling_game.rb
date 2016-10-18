@@ -1,4 +1,5 @@
 require_relative './frame'
+require_relative './exceptions'
 
 class Game
   def initialize
@@ -8,6 +9,7 @@ class Game
   end
 
   def roll pins
+    roll_validate!(pins, @frames[current_frame_index])
     @frames[current_frame_index].regester_roll pins
   end
 
@@ -40,6 +42,10 @@ class Game
     end
 
     result + ' ' + scope.to_s
+  end
+
+  def finish?
+    @frames.all? { |frame| frame.completed? }
   end
 
   private
@@ -95,10 +101,29 @@ class Game
     now_to_next_twice_frames = completed_roll_frames[index..index+2] # 這一局到下二局
 
     # 連續三局全倒回傳true
-    return true if prev_twice_to_now_frames.size == 3 && prev_twice_to_now_frames.all? { |frame| frame.strike? }
-    return true if prev_to_next_frames.size == 3 && prev_to_next_frames.all? { |frame| frame.strike? }
-    return true if now_to_next_twice_frames.size == 3  && now_to_next_twice_frames.all? { |frame| frame.strike? }
+    return true if prev_twice_to_now_frames.size == 3 &&
+                   prev_twice_to_now_frames.all? { |frame| frame.strike? }
+    return true if prev_to_next_frames.size == 3 &&
+                   prev_to_next_frames.all? { |frame| frame.strike? }
+    return true if now_to_next_twice_frames.size == 3  &&
+                   now_to_next_twice_frames.all? { |frame| frame.strike? }
 
     false
+  end
+
+  def roll_validate!(roll, frame)
+    raise Exceptions::RollPinsNotValid if roll_pins_exception? roll
+    raise Exceptions::RollException if finish?
+    raise Exceptions::OverRemaingPins if pins_more_than_remaining_pins?(roll, frame)
+  end
+
+  def roll_pins_exception? roll
+    roll > 10 || roll < 0
+  end
+
+  def pins_more_than_remaining_pins?(roll, frame)
+    return false if !frame.rolls[0]
+    return false if frame.last?
+    roll > (10 - frame.rolls[0])
   end
 end

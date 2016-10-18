@@ -1,5 +1,6 @@
 require 'rspec'
 require_relative '../lib/bowling_game'
+require_relative '../lib/Exceptions'
 require 'byebug'
 
 describe 'Bowling Game' do
@@ -78,6 +79,30 @@ describe 'Bowling Game' do
       game.roll 10
       14.times { game.roll 3 }
       expect(game.game_result).to eq expected_game_result
+    end
+  end
+
+  context 'excetptions' do
+    it 'should be raise RollException if roll game already finish' do
+      expect(game.finish?).to be false
+      20.times { game.roll 1 }
+      expect(game.finish?).to be true
+      expect { game.roll 1 }.to raise_error(Exceptions::RollException)
+    end
+
+    it 'should be raise RollPinsNotValid if roll pin < 0 or > 10' do
+      expect { game.roll -1 }.to raise_error(Exceptions::RollPinsNotValid)
+      expect { game.roll 11 }.to raise_error(Exceptions::RollPinsNotValid)
+      expect { game.roll 15 }.to raise_error(Exceptions::RollPinsNotValid)
+    end
+
+    it 'should be raise OverRemaingPins if pins_more_than_remaining_pins' do
+      game.roll 5
+      expect { game.roll 6 }.to raise_error(Exceptions::OverRemaingPins)
+
+      game2 = Game.new
+      game2.roll 9
+      expect { game2.roll 9 }.to raise_error(Exceptions::OverRemaingPins)
     end
   end
 end
